@@ -27,5 +27,3 @@ rl.on('line', answer => {
 process.on('exit', () => {
   console.log('Это будет вечно храниться в недрах Тайной комнаты!');
 })
-
-//node 02-write-file
