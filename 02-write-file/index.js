@@ -7,30 +7,25 @@ const pathToTxt = path.join(__dirname, 'text.txt');
 const stream = fs.createWriteStream(pathToTxt, 'utf-8');
 const myTxt = fs.createReadStream(pathToTxt);
 
-myTxt.on('data', chunk => console.log(chunk) /* stream.write(chunk) */);
-
-/* const {
+const {
   stdin: input,
   stdout: output,
 } = require('node:process');
 
 const rl = readline.createInterface({ input, output });
 
-rl.question('Не хочешь ли ты мне что-то рассказать?\n', (answer) => {
+rl.write('Не хочешь ли ты мне что-то рассказать?\n');
+
+rl.on('line', answer => {
   if (answer !== 'exit') {
-    myTxt.on('data', chunk => stream.write(chunk));
+    stream.write(`${answer}\n`);
   } else {
-    console.log('Это будет вечно храниться в недрах Тайной комнаты!');
     rl.close();
   }
-  rl.on('line', (output) => {
-    if (output !== 'exit') {
-      myTxt.on('data', chunk => stream.write(chunk));
-    } else {
-      console.log('Это будет вечно храниться в недрах Тайной комнаты!');
-      rl.close();
-    }
-  });
-}); */
+})
+
+process.on('exit', () => {
+  console.log('Это будет вечно храниться в недрах Тайной комнаты!');
+})
 
 //node 02-write-file
