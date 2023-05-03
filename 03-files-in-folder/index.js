@@ -8,7 +8,7 @@ fs.promises.readdir(pathToFolder, {withFileTypes: true}).then(output => {
       const pathToFile = path.join(pathToFolder, item.name);
       const fileName = path.parse(item.name).name
       const fileExt = path.parse(item.name).ext.slice(1);
-      const fileSize = fs.promises.stat(pathToFile).then(file => {
+      fs.promises.stat(pathToFile).then(file => {
         const resultArr = [fileName, fileExt, (file.size / 1024).toFixed(2).toString() + ' kb'];
         console.log(resultArr.join(' - '))
       })
