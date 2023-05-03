@@ -4,6 +4,7 @@ const pathToFolder = path.join(__dirname, 'secret-folder')
 
 fs.promises.readdir(pathToFolder, {withFileTypes: true}).then(output => {
   output.forEach(item => {
+    console.log(item)
     if (item.isFile()) {
       const pathToFile = path.join(pathToFolder, item.name);
       const fileName = path.parse(item.name).name
