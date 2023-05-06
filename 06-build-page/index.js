@@ -11,33 +11,9 @@ htmlStremRead.on('data', (data) => {
   htmlData = data;
 })
 
-const createProjectDist = new Promise((resolve, rejects) => {
-  fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, () => {
-    fs.rm(path.join(__dirname, 'project-dist'), { recursive: true }, () => {
-    })
-    resolve()
-  })
-})
-
-createProjectDist.then(() => {
-  fs.mkdir(path.join(__dirname, 'project-dist', 'assets'), { recursive: true }, () => {})
-  const cleanProjectDist = new Promise ((resolve, rejects) => {
-    fs.readdir(path.join(__dirname, 'project-dist'), { withFileTypes: true }, (err, files) => {
-      if (files.length > 0) {
-        files.forEach(file => {
-          if (file.isFile()) {
-            fs.unlink(path.join(__dirname, 'project-dist', file.name), () => {});
-          } else {
-            cleanDist(path.join(__dirname, 'project-dist', file.name));
-          }
-        })
-      }
-      resolve()
-    })
-  })
-
-  cleanProjectDist.then(() => {
-    const copyAssetsFolder = new Promise((resolve, rejects) => {
+fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, () => {
+  fs.rm(path.join(__dirname, 'project-dist'), { recursive: true }, () => {
+    fs.mkdir(path.join(__dirname, 'project-dist', 'assets'), { recursive: true }, () => {
       fs.readdir(path.join(__dirname, 'assets'), { withFileTypes: true }, (err, files) => {
         files.forEach(file => {
           if (file.isFile()) {
@@ -46,12 +22,6 @@ createProjectDist.then(() => {
             copyAssets(path.join(__dirname, 'assets', file.name), path.join(__dirname, 'project-dist', 'assets', file.name))
           }
         })
-        resolve()
-      })
-    })
-
-    copyAssetsFolder.then(() => {
-      const createHtml = new Promise ((resolve, rejects) => {
         fs.readdir(path.join(__dirname, 'components'), {withFileTypes: true}, (err, files) => {
           files.forEach(file => {
             if (file.isFile()) {
@@ -59,8 +29,8 @@ createProjectDist.then(() => {
               if (fileExt === 'html') {
                 const fileName = path.parse(file.name).name;
                 const fileFullName = path.parse(file.name).base;
-                fsPromises.readFile(path.join(__dirname, 'components', fileFullName), 'utf-8').then(fileText => {
-                  htmlData = htmlData.replace(`{{${fileName}}}`, `${fileText}`);
+                fs.readFile(path.join(__dirname, 'components', fileFullName), 'utf-8', (err, files) => {
+                  htmlData = htmlData.replace(`{{${fileName}}}`, `${files}`);
                   const writeStreamHtml = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'));
                   writeStreamHtml.write(htmlData);
                   writeStreamHtml.close();
@@ -69,49 +39,30 @@ createProjectDist.then(() => {
             }
           })
         })
+        fs.readdir(path.join(__dirname, 'styles'), {withFileTypes: true}, (err, files) => {
+          let cssText = '';
+            files.forEach(file => {
+              if (file.isFile()) {
+                const fileExt = path.parse(file.name).ext.slice(1);
+                if (fileExt === 'css') {
+                  const fileName = path.parse(file.name).name;
+                  const fileFullName = path.parse(file.name).base;
+                  const textCss = '';
+                  fsPromises.readFile(path.join(__dirname, 'styles', fileFullName), 'utf-8').then(fileText => {
+                    cssText += fileText
+                    const writeStreamCss = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
+                    writeStreamCss.write(cssText);
+                    writeStreamCss.close();
+                  })
+                }
+              }
+            })
+          }
+        )
       })
     })
   })
 })
-
-fs.readdir(path.join(__dirname, 'styles'), {withFileTypes: true}, (err, files) => {
-  let cssText = '';
-    files.forEach(file => {
-      if (file.isFile()) {
-        const fileExt = path.parse(file.name).ext.slice(1);
-        if (fileExt === 'css') {
-          const fileName = path.parse(file.name).name;
-          const fileFullName = path.parse(file.name).base;
-          const textCss = '';
-          fsPromises.readFile(path.join(__dirname, 'styles', fileFullName), 'utf-8').then(fileText => {
-            cssText += fileText
-            const writeStreamCss = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
-            writeStreamCss.write(cssText);
-            writeStreamCss.close();
-          })
-        }
-      }
-    })
-  }
-)
-
-
-
-function cleanDist (directory) {
-  fs.readdir(directory, { withFileTypes: true }, (err, files) => {
-    if (files.length > 0) {
-      files.forEach(file => {
-        if (file.isFile()) {
-          fs.unlink(path.join(directory, file.name), () => {});
-        } else {
-          cleanDist(path.join(directory, file.name));
-        }
-      })
-    } else {
-      fs.rmdir(directory, () => {})
-    }
-  })
-}
 
 function copyAssets (directoryOut, directoryIn) {
   fs.mkdir(directoryIn, { recursive: true }, () => {
@@ -126,5 +77,3 @@ function copyAssets (directoryOut, directoryIn) {
     })
   })
 }
-
-// node 06-build-page
