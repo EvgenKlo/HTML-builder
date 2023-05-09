@@ -5,7 +5,6 @@ const readline = require('node:readline');
 
 const pathToTxt = path.join(__dirname, 'text.txt');
 const stream = fs.createWriteStream(pathToTxt, 'utf-8');
-const myTxt = fs.createReadStream(pathToTxt);
 
 const {
   stdin: input,
@@ -22,8 +21,8 @@ rl.on('line', answer => {
   } else {
     rl.close();
   }
-})
+});
 
 process.on('exit', () => {
   console.log('Это будет вечно храниться в недрах Тайной комнаты!');
-})
+});
